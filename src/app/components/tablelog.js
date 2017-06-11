@@ -99,7 +99,7 @@ export default class TableExampleComplex extends Component {
     enableSelectAll: false,
     deselectOnClickaway: true,
     showCheckboxes: true,
-    height: '500px',
+    height: '450px',
   };
 
   handleToggle = (event, toggled) => {

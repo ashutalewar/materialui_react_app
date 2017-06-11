@@ -4,6 +4,7 @@
  */
 import React, {Component} from 'react';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory, Switch } from 'react-router-dom'
+import Websocket from 'react-websocket';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import {deepOrange500} from 'material-ui/styles/colors';
@@ -30,16 +31,36 @@ const muiTheme = getMuiTheme({
 class Main extends Component {
   constructor(props, context) {
     super(props, context);
-
     this.state = {
-      open: false,
-    };
+      count : 90,
+      data_received : ''
+    }
+    this.data_received = {}
+    this.socket =  new WebSocket('ws://127.0.0.1:8888');
+    this.socket.onmessage = (event) => {
+      this.setState({data_received : JSON.parse(event.data)})
+      console.log(this.state.data_received)
+    }
+    this.socket.onopen = (event) => {
+      console.log("connected nowwwwwwww")
+      this.socket.send('ksjhkdsjfkdsj')
+    }
   }
 
   handleRequestClose = () => {
     this.setState({
       open: false,
     });
+  }
+
+  handleData = (data) => {
+    let result = JSON.parse(data);
+    console.log(result)
+    this.setState({count: this.state.count + result.movement});
+  }
+
+  handleStartPick = (bin_no, object_class) => {
+    console.log("Pick from : ", bin_no, object_class)
   }
 
   handleTouchTap = () => {
@@ -49,6 +70,15 @@ class Main extends Component {
   }
 
   render() {
+
+    const Home = () =>
+          <MuiThemeProvider muiTheme={muiTheme}>
+            <div>
+              <ToolbarExamplesSimple startPick={this.handleStartPick}/>
+              <CardExampleExpandable data_received={this.state.data_received}/>
+            </div>
+          </MuiThemeProvider>
+
     const standardActions = (
       <FlatButton
         label="Ok"
@@ -60,9 +90,6 @@ class Main extends Component {
     return (
       <Switch>
         <Route exact path='/' component={Home}/>
-        {/* both /roster and /roster/:number begin with /roster */}
-        <Route path='/roster' component={Address}/>
-        <Route path='/schedule' component={Address}/>
       </Switch>
       //   <Router history={hashHistory}>
       //   <Route path='/' component={Home} />
@@ -72,22 +99,5 @@ class Main extends Component {
     );
   }
 }
-
-
-const Home = () =>
-      <MuiThemeProvider muiTheme={muiTheme}>
-        <div>
-          <ToolbarExamplesSimple />
-          <CardExampleExpandable />
-        </div>
-      </MuiThemeProvider>
-
-const Address = () =>
-      <MuiThemeProvider muiTheme={muiTheme}>
-        <div>
-          <ToolbarExamplesSimple />
-          <CardExampleExpandable />
-        </div>
-      </MuiThemeProvider>
 
 export default Main;

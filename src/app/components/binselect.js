@@ -9,46 +9,49 @@ const styles = {
   },
 };
 
-
 /**
  * `SelectField` is implemented as a controlled component,
  * with the current selection set through the `value` property.
  * The `SelectField` can be disabled with the `disabled` property.
  */
-export default class SelectObjectClass extends Component {
-
+export default class SelectBin extends Component {
 
   constructor(props){
-    super(props)
+    super(props);
+
     this.state = {
-      object_class: this.props.object_class,
+      bin_no: this.props.bin_no,
     };
 
-    autoBind(this)
+    this.bin_nos = this.props.bins.map(eachbin => {
+      return (
+        <MenuItem key={eachbin} value={eachbin} primaryText={eachbin} />
+      )
+    })
+
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if (nextProps.bin_no !== this.state.bin_no) {
+      this.setState({ bin_no: nextProps.bin_no });
+    }
   }
 
   handleChange = (event, index, value) => {
     this.setState({object_class:value});
-    this.props.handleSelectObject(value)
+    this.props.handleSelectBin(value)
   }
 
-
   render() {
-
-    let class_items = this.props.object_classes.map(eachclass => {
-      return (
-        <MenuItem key={eachclass.name} value={eachclass.name} primaryText={eachclass.name} />
-      )
-    })
-
     return (
       <div>
         <SelectField
-          floatingLabelText="Class"
-          value={this.state.object_class}
+          floatingLabelText="Bin No."
+          value={this.state.bin_no}
           onChange={this.handleChange}
         >
-          {class_items}
+          {this.bin_nos}
         </SelectField>
       </div>
     );

@@ -9,9 +9,14 @@ import {
 } from 'material-ui/Table';
 
 export default class TableExampleControlled extends Component {
-  state = {
-    selected: [1],
-  };
+  constructor(props){
+    super(props);
+    this.state = {
+      selected: [1],
+      data_received : this.props.data_received,
+      tableData : []
+    };
+  }
 
   isSelected = (index) => {
     return this.state.selected.indexOf(index) !== -1;
@@ -23,40 +28,35 @@ export default class TableExampleControlled extends Component {
     });
   };
 
+  componentWillReceiveProps(nextProps) {
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if (nextProps.data_received !== this.state.data_received) {
+      this.setState({ data_received: nextProps.data_received });
+      var tableData = this.state.tableData
+      tableData.push(this.state.data_received)
+      this.setState({ tableData : tableData });
+      console.log(this.state.tableData.length)
+    }
+  }
+
   render() {
     return (
-      <Table onRowSelection={this.handleRowSelection} height={'500px'}>
-        <TableHeader>
+      <Table onRowSelection={this.handleRowSelection} height={'450px'}>
+        <TableHeader adjustForCheckbox={false} displaySelectAll={false} enableSelectAll={false}>
           <TableRow>
-            <TableHeaderColumn>ID</TableHeaderColumn>
-            <TableHeaderColumn>Name</TableHeaderColumn>
-            <TableHeaderColumn>Status</TableHeaderColumn>
+            <TableHeaderColumn width={'20px'}>Timestamp</TableHeaderColumn>
+            <TableHeaderColumn>message</TableHeaderColumn>
+            <TableHeaderColumn>topic</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          <TableRow selected={this.isSelected(0)}>
-            <TableRowColumn>1</TableRowColumn>
-            <TableRowColumn style={{wordWrap: 'break-word', whiteSpace: 'normal'}}>John sdkf sdkf kds fkds kfkd fk
-             dskf kj dkf ksd kf
-                kds fks f kds kf kd kf kdfkdk
-             fkd skfkdskfkds kjfSmith</TableRowColumn>
-            <TableRowColumn>Employed</TableRowColumn>
+        <TableBody displayRowCheckbox={false}>
+        {this.state.tableData.map( (row, index) => (
+          <TableRow key={index}>
+            <TableRowColumn  width={'30px'}>{row.timestamp}</TableRowColumn>
+            <TableRowColumn style={{wordWrap: 'break-word', whiteSpace: 'normal'}}>{row.message}</TableRowColumn>
+            <TableRowColumn>{row.topic}</TableRowColumn>
           </TableRow>
-          <TableRow selected={this.isSelected(1)}>
-            <TableRowColumn>2</TableRowColumn>
-            <TableRowColumn>Randal White</TableRowColumn>
-            <TableRowColumn>Unemployed</TableRowColumn>
-          </TableRow>
-          <TableRow selected={this.isSelected(2)}>
-            <TableRowColumn>3</TableRowColumn>
-            <TableRowColumn>Stephanie Sanders</TableRowColumn>
-            <TableRowColumn>Employed</TableRowColumn>
-          </TableRow>
-          <TableRow>
-            <TableRowColumn selected={this.isSelected(3)}>4</TableRowColumn>
-            <TableRowColumn>Steve Brown</TableRowColumn>
-            <TableRowColumn>Employed</TableRowColumn>
-          </TableRow>
+          ))}
         </TableBody>
       </Table>
     );
